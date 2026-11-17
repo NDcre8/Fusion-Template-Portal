@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Dealer artwork portal – prototype</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{--bg:#EEF1E6;--surface:#FAFAF8;--accent:#92d400;--ink:#191919;--muted:#6b6e5f;--border:#C8CAB8;--r:12px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+header{background:var(--ink);color:#fff;padding:14px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:.04em}.brand i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:8px}
+.lock{font-size:13px;color:#cfd2c0;display:flex;gap:8px;align-items:center}
+.lock b{color:#fff;font-weight:600}
+main{max-width:1120px;margin:0 auto;padding:20px;display:grid;gap:24px;padding-bottom:110px}
+h1{font-size:clamp(22px,4vw,30px);line-height:1.2;margin:0 0 4px}
+.lede{color:var(--muted);margin:0}
+.stage{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.canvaswrap{width:100%;display:flex;justify-content:center;background:repeating-conic-gradient(#e6e8dc 0 25%,#f2f4ea 0 50%) 0 0/20px 20px;border-radius:8px;padding:12px}
+canvas{max-width:100%;max-height:68vh;width:auto;height:auto;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.tabs{display:flex;gap:8px;width:100%}
+.tab{flex:1;min-height:56px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r);padding:6px 8px;cursor:pointer;text-align:center;line-height:1.25}
+.tab small{display:block;color:var(--muted);font-size:12px}
+.tab[aria-selected=true]{border-color:var(--ink);background:var(--ink);color:#fff}.tab[aria-selected=true] small{color:#cfd2c0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;display:grid;gap:20px;align-content:start}
+.step{display:grid;gap:8px}
+.step label.h{font-weight:700;font-size:18px}
+.num{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);font-size:14px;font-weight:700;margin-right:8px}
+input[type=text]{width:100%;min-height:52px;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);background:#fff;font-size:17px}
+.meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);gap:8px}
+.sugg{display:grid;gap:6px}
+.sugg button{min-height:48px;text-align:left;padding:8px 14px;border:1px solid var(--border);background:#fff;border-radius:10px;cursor:pointer}
+.sugg button:hover{border-color:var(--ink)}
+.sugg .free{border-style:dashed;color:var(--muted)}
+.fit{font-size:14px;padding:10px 12px;border-radius:10px;background:#f1f6e3;border:1px solid #cfe5a0}
+.fit.warn{background:#fff4e0;border-color:#f0c77a}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;min-height:48px;border:1.5px solid var(--border);background:#fff;border-radius:var(--r);cursor:pointer;font-weight:600}
+.seg button[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tog{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted);min-height:44px}
+.tog input{width:22px;height:22px;accent-color:var(--ink)}
+.btn{min-height:56px;border:0;border-radius:var(--r);background:var(--accent);color:var(--ink);font-weight:700;font-size:17px;cursor:pointer;padding:0 20px;width:100%}
+.btn:hover{filter:brightness(.95)}
+.btn.sec{background:#fff;border:1.5px solid var(--ink);font-weight:600}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;grid-template-columns:1fr;z-index:5}
+.status{min-height:20px;font-size:14px;color:var(--muted);text-align:center}
+.note{font-size:13px;color:var(--muted);border-top:1px solid var(--border);padding-top:12px}
+@media(min-width:900px){
+ main{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:start;padding-bottom:40px}
+ .head{grid-column:1/-1}.stage{position:sticky;top:16px}
+ .bar{position:static;border:0;background:none;padding:0}
+}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><i></i>FUSION</div>
+ <div class="lock">🔒 Private link · <b>Placeholder Campaign</b> · Expires 31 Jan</div>
+</header>
+<main>
+ <div class="head">
+  <h1>Personalise your social artwork</h1>
+  <p class="lede">Pick your dealership, check the preview, download. Takes about a minute.</p>
+ </div>
+
+ <section class="stage" aria-label="Preview">
+  <div class="canvaswrap"><canvas id="cv" width="1080" height="1080" role="img" aria-label="Artwork preview"></canvas></div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+ </section>
+
+ <section class="panel">
+  <div class="step">
+   <label class="h" for="dn"><span class="num">1</span>Which dealership?</label>
+   <input type="text" id="dn" maxlength="40" autocomplete="off" placeholder="Start typing your dealership name" aria-describedby="cnt">
+   <div class="meta"><span id="cnt">0 / 40 characters</span><span>Appears in the artwork exactly as typed</span></div>
+   <div class="sugg" id="sugg"></div>
+   <div class="fit" id="fit" role="status"></div>
+  </div>
+  <div class="step">
+   <span class="h"><span class="num">2</span>Choose a format</span>
+   <div class="seg" id="fmt">
+    <button type="button" data-f="png" aria-pressed="true">PNG<br><small>Sharpest text</small></button>
+    <button type="button" data-f="jpeg" aria-pressed="false">JPG<br><small>Smaller file</small></button>
+   </div>
+   <label class="tog"><input type="checkbox" id="safe"> Show Stories &amp; Reels safe zones (preview only)</label>
+  </div>
+  <div class="step">
+   <span class="h"><span class="num">3</span>Download</span>
+   <div class="bar">
+    <button class="btn" id="all" type="button">Download all sizes (.zip)</button>
+    <button class="btn sec" id="one" type="button">Download this size only</button>
+    <div class="status" id="st" role="status" aria-live="polite"></div>
+   </div>
+  </div>
+  <p class="note">Prototype: placeholder artwork only. In production the background, logos and fonts come from the approved client pack, and only the dealer name zone is editable.</p>
+ </section>
+</main>
+
+<script>
+const FONT='Inter, system-ui, Arial, sans-serif';
+const DEALERS=['Arnold Clark Glasgow','Sytner Milton Keynes','Lookers Manchester','Marshall Cambridge','Vertu Newcastle','JCT600 Leeds','Evans Halshaw Derby','Stoneacre Lincoln','Rybrook Shrewsbury','Pentland Brighton & Hove','Jardine Motors Guildford','Hartwell Oxford'];
+const SIZES={
+ square:{w:1080,h:1080,label:'Square',sub:'1080 × 1080',safe:null},
+ story:{w:1080,h:1920,label:'Story / Reel',sub:'1080 × 1920',safe:{t:250,b:340}},
+ paid:{w:1080,h:1350,label:'Paid',sub:'1080 × 1350',safe:null}
+};
+const S={size:'square',name:'',fmt:'png',safe:false};
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const $=id=>document.getElementById(id);
+
+function layoutRuns(c,runs,size,maxW){
+ const lines=[[]];let x=0;
+ for(const r of runs){
+  c.font=`${r.hl?800:500} ${size}px ${FONT}`;
+  const sp=c.measureText(' ').width,ww=c.measureText(r.t).width;
+  if(x>0&&x+sp+ww>maxW){lines.push([]);x=0}
+  if(x>0)x+=sp;
+  lines[lines.length-1].push({t:r.t,hl:r.hl,x,w:ww});x+=ww;
+ }
+ return lines;
+}
+function rr(c,x,y,w,h,r){c.beginPath();c.roundRect?c.roundRect(x,y,w,h,r):c.rect(x,y,w,h)}
+
+function draw(c,k,name,safe){
+ const {w,h}=SIZES[k],m=80,isS=k==='story';
+ c.canvas.width=w;c.canvas.height=h;
+ // background (placeholder for supplied artwork layer)
+ const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'#191919');g.addColorStop(1,'#2b3020');
+ c.fillStyle=g;c.fillRect(0,0,w,h);
+ const rg=c.createRadialGradient(w*.75,h*.62,20,w*.75,h*.62,w*.7);rg.addColorStop(0,'rgba(146,212,0,.30)');rg.addColorStop(1,'rgba(146,212,0,0)');
+ c.fillStyle=rg;c.fillRect(0,0,w,h);
+ c.strokeStyle='rgba(255,255,255,.07)';c.lineWidth=3;
+ for(let i=0;i<4;i++){c.beginPath();c.arc(w*.8,h*.7,200+i*130,0,Math.PI*2);c.stroke()}
+ // text
+ const base=k==='square'?68:k==='story'?82:74;
+ let y=isS?SIZES.story.safe.t:m;
+ const maxW=w-m*2;
+ c.fillStyle='#fff';c.textBaseline='top';
+ const head=layoutRuns(c,'This is more than a test drive. This is your journey to the prize.'.split(' ').map(t=>({t,hl:false})),base,maxW);
+ const lh=1.14;
+ head.forEach(l=>{l.forEach(r=>{c.font=`700 ${base}px ${FONT}`;c.fillText(r.t,m+r.x,y)});y+=base*lh});
+ y+=base*.3;
+ // dynamic paragraph
+ const shown=name.trim()||'Your Dealership';
+ const runs=[...'Test drive at'.split(' ').map(t=>({t,hl:false})),...shown.split(/\s+/).map(t=>({t,hl:true})),...'for your chance to win a prize.*'.split(' ').map(t=>({t,hl:false}))];
+ const pBase=base*.62,maxLines=3;let size=pBase,lines;
+ for(;size>=pBase*.6;size-=2){lines=layoutRuns(c,runs,size,maxW);if(lines.length<=maxLines)break}
+ const overflow=lines.length>maxLines;
+ lines.forEach(l=>{l.forEach(r=>{c.font=`${r.hl?800:500} ${size}px ${FONT}`;c.fillStyle=r.hl?'#92d400':'#fff';c.fillText(r.t,m+r.x,y)});y+=size*1.25});
+ const textBottom=y;
+ // logo row + terms
+ const bottomLimit=h-(isS?SIZES.story.safe.b:m);
+ const logoH=96,logoY=bottomLimit-logoH;
+ c.fillStyle='rgba(255,255,255,.6)';c.font=`400 22px ${FONT}`;c.fillText('*Terms and conditions apply.',m,logoY-44);
+ c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=2;c.setLineDash([8,6]);
+ rr(c,m,logoY,230,logoH,8);c.stroke();rr(c,m+270,logoY,230,logoH,8);c.stroke();c.setLineDash([]);
+ c.fillStyle='rgba(255,255,255,.7)';c.font=`600 20px ${FONT}`;c.textAlign='center';
+ c.fillText('CLIENT LOGO',m+115,logoY+38);c.fillText('PARTNER LOGO',m+385,logoY+38);c.textAlign='left';
+ // vehicle placeholder
+ const top=textBottom+40,bot=logoY-90;
+ if(bot-top>120){
+  const vh=Math.min(bot-top,w*.5);const vy=top+(bot-top-vh)/2;
+  c.fillStyle='rgba(255,255,255,.06)';rr(c,m,vy,w-m*2,vh,24);c.fill();
+  c.strokeStyle='rgba(255,255,255,.35)';c.setLineDash([12,10]);rr(c,m,vy,w-m*2,vh,24);c.stroke();c.setLineDash([]);
+  c.fillStyle='rgba(255,255,255,.7)';c.font=`600 26px ${FONT}`;c.textAlign='center';
+  c.fillText('VEHICLE IMAGE PLACEHOLDER',w/2,vy+vh/2-13);c.textAlign='left';
+ }
+ // safe zones (preview only)
+ if(safe&&SIZES[k].safe){
+  const s=SIZES[k].safe;c.fillStyle='rgba(255,60,60,.28)';
+  c.fillRect(0,0,w,s.t);c.fillRect(0,h-s.b,w,s.b);
+  c.fillStyle='#fff';c.font=`700 24px ${FONT}`;c.textAlign='center';
+  c.fillText('PLATFORM UI – KEEP CLEAR',w/2,s.t/2-12);c.fillText('PLATFORM UI – KEEP CLEAR',w/2,h-s.b/2-12);c.textAlign='left';
+ }
+ return {scale:size/pBase,overflow};
+}
+
+function render(){
+ const r=draw(ctx,S.size,S.name,S.safe);
+ const f=$('fit');
+ if(r.overflow){f.className='fit warn';f.textContent='This name is very long for the layout. Try a shorter version, such as the town name only.'}
+ else if(r.scale<0.999){f.className='fit';f.textContent=`Text reduced to ${Math.round(r.scale*100)}% so your name fits.`}
+ else{f.className='fit';f.textContent=S.name.trim()?'Fits at full size.':'Showing a placeholder name until you choose yours.'}
+}
+function suggest(){
+ const q=S.name.trim().toLowerCase(),box=$('sugg');box.innerHTML='';
+ const hits=DEALERS.filter(d=>!q||d.toLowerCase().includes(q)).slice(0,4);
+ hits.forEach(d=>{if(d.toLowerCase()===q)return;const b=document.createElement('button');b.type='button';b.textContent=d;b.onclick=()=>{S.name=d;$('dn').value=d;upd()};box.appendChild(b)});
+ if(q&&!DEALERS.some(d=>d.toLowerCase()===q)){const b=document.createElement('button');b.type='button';b.className='free';b.textContent=`Not listed? Use “${S.name.trim()}” as typed`;b.onclick=()=>$('dn').blur();box.appendChild(b)}
+}
+function upd(){$('cnt').textContent=`${S.name.length} / 40 characters`;suggest();render()}
+
+// tabs
+const tabs=$('tabs');
+Object.entries(SIZES).forEach(([k,v])=>{
+ const b=document.createElement('button');b.type='button';b.className='tab';b.setAttribute('role','tab');b.dataset.k=k;
+ b.innerHTML=`${v.label}<small>${v.sub}</small>`;
+ b.onclick=()=>{S.size=k;[...tabs.children].forEach(t=>t.setAttribute('aria-selected',t.dataset.k===k));render()};
+ b.setAttribute('aria-selected',k===S.size);tabs.appendChild(b);
+});
+$('dn').addEventListener('input',e=>{S.name=e.target.value;upd()});
+$('safe').addEventListener('change',e=>{S.safe=e.target.checked;render()});
+document.querySelectorAll('#fmt button').forEach(b=>b.onclick=()=>{S.fmt=b.dataset.f;document.querySelectorAll('#fmt button').forEach(x=>x.setAttribute('aria-pressed',x===b));try{localStorage.setItem('fmt',S.fmt)}catch(e){}});
+try{const f=localStorage.getItem('fmt');if(f){S.fmt=f;document.querySelectorAll('#fmt button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f===f))}}catch(e){}
+
+// export
+const slug=()=>(S.name.trim()||'dealer').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const ext=()=>S.fmt==='png'?'png':'jpg';
+function exportBlob(k){
+ const c=document.createElement('canvas'),x=c.getContext('2d');
+ draw(x,k,S.name,false);
+ return new Promise(res=>c.toBlob(res,'image/'+S.fmt,.92));
+}
+function save(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+const T=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc=d=>{let c=~0;for(let i=0;i<d.length;i++)c=T[(c^d[i])&255]^(c>>>8);return ~c>>>0};
+function zip(files){
+ const enc=new TextEncoder(),parts=[],cd=[];let off=0;
+ for(const f of files){
+  const n=enc.encode(f.name),c=crc(f.data),h=new DataView(new ArrayBuffer(30));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x0800,true);h.setUint32(14,c,true);h.setUint32(18,f.data.length,true);h.setUint32(22,f.data.length,true);h.setUint16(26,n.length,true);
+  parts.push(h.buffer,n,f.data);
+  const d=new DataView(new ArrayBuffer(46));
+  d.setUint32(0,0x02014b50,true);d.setUint16(4,20,true);d.setUint16(6,20,true);d.setUint16(8,0x0800,true);d.setUint32(16,c,true);d.setUint32(20,f.data.length,true);d.setUint32(24,f.data.length,true);d.setUint16(28,n.length,true);d.setUint32(42,off,true);
+  cd.push(d.buffer,n);off+=30+n.length+f.data.length;
+ }
+ const cs=cd.reduce((a,b)=>a+b.byteLength,0),e=new DataView(new ArrayBuffer(22));
+ e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+ return new Blob([...parts,...cd,e.buffer],{type:'application/zip'});
+}
+const say=m=>{$('st').textContent=m};
+$('one').onclick=async()=>{say('Preparing…');save(await exportBlob(S.size),`${slug()}_${S.size}.${ext()}`);say('Downloaded. Check your downloads folder.')};
+$('all').onclick=async()=>{
+ say('Preparing all sizes…');
+ const files=[];
+ for(const k of Object.keys(SIZES)){const b=await exportBlob(k);files.push({name:`${slug()}_${k}.${ext()}`,data:new Uint8Array(await b.arrayBuffer())})}
+ save(zip(files),`${slug()}_social-pack.zip`);say('Downloaded. Check your downloads folder.');
+};
+
+render();suggest();
+(document.fonts&&document.fonts.load?Promise.all([document.fonts.load('500 40px Inter'),document.fonts.load('700 40px Inter'),document.fonts.load('800 40px Inter')]).then(render).catch(()=>{}):0);
+</script>
+</body>
+</html>
